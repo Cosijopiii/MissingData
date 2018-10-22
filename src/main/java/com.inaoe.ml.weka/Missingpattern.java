@@ -8,10 +8,15 @@ import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class Missingpattern {
+    public String file;
 
+    /**
+     * @param file Es el nombre del archivo por ejemplo  "Credit"
+     */
+    public Missingpattern(String file){
+        this.file=file;
 
-    public Missingpattern(){
-       ArrayList<StoreAttAndIndexInstance> MP=getPatterns();
+       ArrayList<StoreAttAndIndexInstance> MP=getPatterns(file);
         for (StoreAttAndIndexInstance aMP : MP) {
             for (Attribute attribute:aMP.attribute) {
                 System.out.println(attribute);
@@ -21,9 +26,9 @@ public class Missingpattern {
 
     }
 
-    public ArrayList<StoreAttAndIndexInstance> getPatterns(){
+    public ArrayList<StoreAttAndIndexInstance> getPatterns(String file){
         String pathDB = "src/main/resources/DATABASE/OriginalDB/";
-        String file="Credit";
+        //String file="Credit";
         String format = ".arff";
         Instances get=Weka_main.Open(pathDB+file+format);
         ArrayList<Attribute> temp;
