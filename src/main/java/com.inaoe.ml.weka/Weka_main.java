@@ -41,7 +41,7 @@ public class Weka_main {
         //System.out.println(dataCSF);
 }
     
-private static Instances Open(String nameFile){
+public static Instances Open(String nameFile){
 Instances datos;
 try {
         FileReader fileReader = new FileReader(nameFile);
@@ -63,13 +63,11 @@ public static Instances CFS()throws Exception
      Instances dataDB, dataMICE, dataKNN;
      File arffSaver;
      String filename;
-     String pathMICE = "DATABASE/MICEImp/";
-     String pathDB = "DATABASE/OriginalDB/";
-     String pathKNN = "DATABASE/KNNI/";
-     String format = ".arff";
-     
+     String pathMICE = "src/main/resources/DATABASE/MICEImp/";
+     String pathDB = "src/main/resources/DATABASE/OriginalDB/";
+     String pathKNN = "src/main/resources/DATABASE/KNNI/";
+    String format = ".arff";
      String imputation = "-MICE";
-
      String []FileDB = {"Credit","Heart-c","Heart-h","hepatitis","house-votes-84","mammographic_masses"};
      
      
@@ -90,9 +88,9 @@ public static Instances CFS()throws Exception
          attsel.SelectAttributes(dataDB);
          dataDB = attsel.reduceDimensionality(dataDB);
          //System.out.println(dataDB); 
-         filename = "DATABASE/FeatureSelection/CFS/OriginalDB/"+FileDB[i]+".arff";
+         filename = "src/main/resources/DATABASE/FeatureSelection/CFS/OriginalDB/"+FileDB[i]+".arff";
          arffSaver = Weka_main.saveInstancesToArffFile(dataDB,filename);
-         filename = "DATABASE/FeatureSelection/CFS/MICE/"+FileDB[i]+".arff";
+         filename = "src/main/resources/DATABASE/FeatureSelection/CFS/MICE/"+FileDB[i]+".arff";
          arffSaver = Weka_main.saveInstancesToArffFile(dataMICE,filename);
      }
     return null;
