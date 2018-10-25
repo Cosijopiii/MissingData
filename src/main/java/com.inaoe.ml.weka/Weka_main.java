@@ -3,44 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.inaoe.ml.weka;
+package weka;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
+import weka.attributeSelection.AttributeSelection;
 import weka.attributeSelection.BestFirst;
 import weka.attributeSelection.CfsSubsetEval;
-import weka.attributeSelection.GreedyStepwise;
-import weka.attributeSelection.*;
-
-import weka.filters.*;
-import weka.filters.Filter;
-import weka.filters.unsupervised.attribute.*;
-import weka.attributeSelection.ASSearch;
-//import weka.filters.supervised.attribute.*;
-
-import weka.core.converters.ArffSaver;
 import weka.core.Instances;
-import weka.core.Utils;
-import weka.core.converters.ConverterUtils.DataSource;
+import weka.core.converters.ArffSaver;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Remove;
 
- /*
+/**
+ *
  * @author Fer
  */
 public class Weka_main {
-
-    /**
-     * @param args the command line arguments
-     */
-   /* public static void main(String[] args) {
-        Instances dataCSF;       
-        //System.out.println(data);
-       // dataCSF = Weka_main.CFS();
-        //System.out.println(dataCSF);*/
-    Weka_main(){
-    }
+    
 public Instances Open(String nameFile){
 Instances datos;
 try {
@@ -64,7 +46,7 @@ public Instances CFS()throws Exception
      String filename;
      String pathMICE = "DATABASE/MICEImp/";
      String pathDB = "DATABASE/OriginalDB/";
-     String pathKNN = "DATABASE/KNNI/";
+     String pathKNN = "DATABASE/KnnImputation/";
      String format = ".arff";
      
      String imputation = "-MICE";
@@ -91,6 +73,31 @@ public Instances CFS()throws Exception
          arffSaver = saveInstancesToArffFile(dataDB,filename);
          filename = "DATABASE/FeatureSelection/CFS/MICE/"+FileDB[i]+".arff";
          arffSaver = saveInstancesToArffFile(dataMICE,filename);
+     }
+     
+     for (int i = 0; i<FileDB.length; i++)
+     {
+         for(int j=5; j<=20; j=j+5)
+         {
+            dataKNN = Open(pathKNN+FileDB[i]+"-KNNI-"+j+format);
+            dataDB = Open(pathDB+FileDB[i]+format);         
+            //System.out.println(pathMICE+FileDB[i]+imputation+format+"-"+pathDB+FileDB[i]+format);
+            AttributeSelection attsel = new AttributeSelection();
+            CfsSubsetEval eval = new CfsSubsetEval();
+            BestFirst search = new BestFirst();
+            attsel.setEvaluator(eval);
+            attsel.setSearch(search);
+            attsel.SelectAttributes(dataKNN);
+            dataMICE = attsel.reduceDimensionality(dataKNN);
+            //System.out.println(dataMICE);
+            attsel.SelectAttributes(dataDB);
+            dataDB = attsel.reduceDimensionality(dataDB);
+            //System.out.println(dataDB); 
+            //filename = "DATABASE/FeatureSelection/CFS/OriginalDB/"+FileDB[i]+".arff";
+            //arffSaver = saveInstancesToArffFile(dataDB,filename);
+            filename = "DATABASE/FeatureSelection/CFS/KNN/"+FileDB[i]+"-KNN-"+j+".arff";
+            arffSaver = saveInstancesToArffFile(dataKNN,filename);
+         }
      }
      return null;
 }
@@ -146,7 +153,7 @@ public Instances remove_attributes(int[] indices, Instances data) throws Excepti
     removeFilter.setInvertSelection(true);
     removeFilter.setInputFormat(data);
     Data = Filter.useFilter(data, removeFilter);
+    System.out.println(Data);
     return Data;
 }
 }
-
