@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 public class Missingpattern {
     public String file;
-
+    Weka_main w = new Weka_main();
     /**
      * @param file Es el nombre del archivo por ejemplo  "Credit"
      */
@@ -25,12 +25,12 @@ public class Missingpattern {
         }
 
     }
-
     public ArrayList<StoreAttAndIndexInstance> getPatterns(String file){
         String pathDB = "src/main/resources/DATABASE/OriginalDB/";
         //String file="Credit";
+        
         String format = ".arff";
-        Instances get=Weka_main.Open(pathDB+file+format);
+        Instances get=w.Open(pathDB+file+format);
         ArrayList<Attribute> temp;
         ArrayList<StoreAttAndIndexInstance> MP=new ArrayList<>();
         for (int i=0; i<get.numInstances();i++){

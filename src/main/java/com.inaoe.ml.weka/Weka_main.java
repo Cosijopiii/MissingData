@@ -34,14 +34,14 @@ public class Weka_main {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws Exception{
+   /* public static void main(String[] args) {
         Instances dataCSF;       
         //System.out.println(data);
-        dataCSF = Weka_main.CFS();
-        //System.out.println(dataCSF);
-}
-    
-public static Instances Open(String nameFile){
+       // dataCSF = Weka_main.CFS();
+        //System.out.println(dataCSF);*/
+    Weka_main(){
+    }
+public Instances Open(String nameFile){
 Instances datos;
 try {
         FileReader fileReader = new FileReader(nameFile);
@@ -57,25 +57,24 @@ try {
 return datos;
 }
 
-public static Instances CFS()throws Exception
+public Instances CFS()throws Exception
 {
-    //Nada kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
      Instances dataDB, dataMICE, dataKNN;
      File arffSaver;
      String filename;
-     String pathMICE = "src/main/resources/DATABASE/MICEImp/";
-     String pathDB = "src/main/resources/DATABASE/OriginalDB/";
-     String pathKNN = "src/main/resources/DATABASE/KNNI/";
-    String format = ".arff";
+     String pathMICE = "DATABASE/MICEImp/";
+     String pathDB = "DATABASE/OriginalDB/";
+     String pathKNN = "DATABASE/KNNI/";
+     String format = ".arff";
+     
      String imputation = "-MICE";
+
      String []FileDB = {"Credit","Heart-c","Heart-h","hepatitis","house-votes-84","mammographic_masses"};
-     
-     
      
      for (int i = 0; i<FileDB.length; i++)
      {
-         dataMICE = Weka_main.Open(pathMICE+FileDB[i]+imputation+format);
-         dataDB = Weka_main.Open(pathDB+FileDB[i]+format);         
+         dataMICE = Open(pathMICE+FileDB[i]+imputation+format);
+         dataDB = Open(pathDB+FileDB[i]+format);         
          //System.out.println(pathMICE+FileDB[i]+imputation+format+"-"+pathDB+FileDB[i]+format);
          AttributeSelection attsel = new AttributeSelection();
          CfsSubsetEval eval = new CfsSubsetEval();
@@ -88,15 +87,14 @@ public static Instances CFS()throws Exception
          attsel.SelectAttributes(dataDB);
          dataDB = attsel.reduceDimensionality(dataDB);
          //System.out.println(dataDB); 
-         filename = "src/main/resources/DATABASE/FeatureSelection/CFS/OriginalDB/"+FileDB[i]+".arff";
-         arffSaver = Weka_main.saveInstancesToArffFile(dataDB,filename);
-         filename = "src/main/resources/DATABASE/FeatureSelection/CFS/MICE/"+FileDB[i]+".arff";
-         arffSaver = Weka_main.saveInstancesToArffFile(dataMICE,filename);
+         filename = "DATABASE/FeatureSelection/CFS/OriginalDB/"+FileDB[i]+".arff";
+         arffSaver = saveInstancesToArffFile(dataDB,filename);
+         filename = "DATABASE/FeatureSelection/CFS/MICE/"+FileDB[i]+".arff";
+         arffSaver = saveInstancesToArffFile(dataMICE,filename);
      }
-    return null;
+     return null;
 }
-
-private static File saveInstancesToArffFile(Instances instances, String filename) throws IOException
+private  File saveInstancesToArffFile(Instances instances, String filename) throws IOException
 {
     try
     {
@@ -115,42 +113,40 @@ private static File saveInstancesToArffFile(Instances instances, String filename
         System.out.println("Hay algo mal al leer el archivo " + e);
     return null;
     }
-    //return arffSaver.retrieveFile();
 }
 
-public static Instances GA()throws Exception
+public  Instances GA()throws Exception
 {
-     Instances dataDB, dataMICE, dataKNN;
-     File arffSaver;
-     String filename;
-     String pathMICE = "DATABASE/MICEImp/";
-     String pathDB = "DATABASE/OriginalDB/";
-     String pathKNN = "DATABASE/KNNI/";
-     String format = ".arff";
      
-     String imputation = "-MICE";
-
-     String []FileDB = {"Credit","Heart-c","Heart-h","hepatitis","house-votes-84","mammographic_masses"};
-     
-     for (int i = 0; i<FileDB.length; i++)
-     {
-         dataMICE = Weka_main.Open(pathMICE+FileDB[i]+imputation+format);
-         dataDB = Weka_main.Open(pathDB+FileDB[i]+format);         
-         //System.out.println(pathMICE+FileDB[i]+imputation+format+"-"+pathDB+FileDB[i]+format);
-         AttributeSelection attsel = new AttributeSelection();
-         
-         /*GeneticSearch ga = new GeneticSearch();
-         ga.setPopulationSize(50);
-         ga.setMaxGenerations(100);
-         */
-         
-       
-         
-         filename = "DATABASE/FeatureSelection/GA/OriginalDB/"+FileDB[i]+".arff";
-         arffSaver = Weka_main.saveInstancesToArffFile(dataDB,filename);
-         filename = "DATABASE/FeatureSelection/GA/MICE/"+FileDB[i]+".arff";
-         arffSaver = Weka_main.saveInstancesToArffFile(dataMICE,filename);
-     }
     return null;
 }
+
+public int[] cfs_attributes(String FileName)throws Exception
+{
+     Instances dataMICE;
+     String pathMICE = "DATABASE/MICEImp/";
+     String format = ".arff";
+     String imputation = "-MICE";
+     dataMICE = this.Open(pathMICE+FileName+imputation+format);
+     AttributeSelection attsel = new AttributeSelection();
+     CfsSubsetEval eval = new CfsSubsetEval();
+     BestFirst search = new BestFirst();
+     attsel.setEvaluator(eval);
+     attsel.setSearch(search);
+     attsel.SelectAttributes(dataMICE);
+     int indices[] = attsel.selectedAttributes();
+    return indices;
 }
+
+public Instances remove_attributes(int[] indices, Instances data) throws Exception
+{
+    Instances Data;
+    Remove removeFilter = new Remove();
+    removeFilter.setAttributeIndicesArray(indices);
+    removeFilter.setInvertSelection(true);
+    removeFilter.setInputFormat(data);
+    Data = Filter.useFilter(data, removeFilter);
+    return Data;
+}
+}
+
