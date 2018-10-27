@@ -13,13 +13,17 @@ import java.util.Random;
 import weka.attributeSelection.AttributeSelection;
 import weka.attributeSelection.BestFirst;
 import weka.attributeSelection.CfsSubsetEval;
+import weka.attributeSelection.WrapperSubsetEval;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.BayesNet;
+import weka.classifiers.bayes.net.search.global.GeneticSearch;
 import weka.classifiers.rules.PART;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.NumericToNominal;
 import weka.filters.unsupervised.attribute.Remove;
 
 /**
@@ -43,7 +47,6 @@ try {
     }
 return datos;
 }
-
 public Instances CFS()throws Exception
 {
      Instances dataDB, dataMICE, dataKNN;
@@ -56,7 +59,7 @@ public Instances CFS()throws Exception
      
      String imputation = "-MICE";
 
-     String []FileDB = {"Credit","Heart-c","Heart-h","hepatitis","house-votes-84","mammographic_masses"};
+     String []FileDB = {"Credit","Heart-c","Heart-h","hepatitis","house-votes-84","mammographic_masses", "Tumor"};
      
      for (int i = 0; i<FileDB.length; i++)
      {
@@ -66,13 +69,23 @@ public Instances CFS()throws Exception
          AttributeSelection attsel = new AttributeSelection();
          CfsSubsetEval eval = new CfsSubsetEval();
          BestFirst search = new BestFirst();
+         
          attsel.setEvaluator(eval);
          attsel.setSearch(search);
          attsel.SelectAttributes(dataMICE);
          dataMICE = attsel.reduceDimensionality(dataMICE);
+         
          //System.out.println(dataMICE);
          attsel.SelectAttributes(dataDB);
          dataDB = attsel.reduceDimensionality(dataDB);
+
+        NumericToNominal filter = new NumericToNominal();
+        filter.setInputFormat(dataMICE);
+        dataMICE = Filter.useFilter(dataMICE, filter);
+        
+        filter.setInputFormat(dataDB);
+        dataDB = Filter.useFilter(dataDB, filter);
+        
          //System.out.println(dataDB); 
          filename = "DATABASE/FeatureSelection/CFS/OriginalDB/"+FileDB[i]+".arff";
          arffSaver = saveInstancesToArffFile(dataDB,filename);
@@ -97,6 +110,11 @@ public Instances CFS()throws Exception
             //System.out.println(dataMICE);
             attsel.SelectAttributes(dataDB);
             dataDB = attsel.reduceDimensionality(dataDB);
+            
+            NumericToNominal filter = new NumericToNominal();
+            filter.setInputFormat(dataKNN);
+            dataKNN = Filter.useFilter(dataKNN, filter);
+        
             //System.out.println(dataDB); 
             //filename = "DATABASE/FeatureSelection/CFS/OriginalDB/"+FileDB[i]+".arff";
             //arffSaver = saveInstancesToArffFile(dataDB,filename);
@@ -106,6 +124,7 @@ public Instances CFS()throws Exception
      }
      return null;
 }
+
 private  File saveInstancesToArffFile(Instances instances, String filename) throws IOException
 {
     try
@@ -118,6 +137,7 @@ private  File saveInstancesToArffFile(Instances instances, String filename) thro
     }
     ArffSaver arffSaver = new ArffSaver();
     arffSaver.setInstances(instances);
+    
     arffSaver.setFile(outputFile);
     arffSaver.writeBatch();  
      return arffSaver.retrieveFile();
@@ -129,7 +149,51 @@ private  File saveInstancesToArffFile(Instances instances, String filename) thro
 
 public  Instances GA()throws Exception
 {
+     Instances dataDB, dataMICE, dataKNN;
+     File arffSaver;
+     String filename;
+     String pathMICE = "DATABASE/MICEImp/";
+     String pathDB = "DATABASE/OriginalDB/";
+     String pathKNN = "DATABASE/KnnImputation/";
+     String format = ".arff";
      
+     String imputation = "-MICE";
+
+     String []FileDB = {"Credit","Heart-c","Heart-h","hepatitis","house-votes-84","mammographic_masses"};
+     
+     for (int i = 0; i<FileDB.length; i++)
+     {
+         dataMICE = Open(pathMICE+FileDB[i]+imputation+format);
+         
+         AttributeSelection attsel = new AttributeSelection();
+         WrapperSubsetEval eval = new WrapperSubsetEval();
+         
+         //WrapperSubsetEval WrapperEval_nbc = new WrapperSubsetEval(); 
+         String[] WrapperEvalOpts_nbc = {"-B weka.classifiers.bayes.BayesNet -F 5 -T 0.01 -R 1 -E ACC -- -Q weka.classifiers.bayes.net.search.local.GeneticSearch -- -L 50 -A 100 -U 100 -R 1 -M 0.9 -C 0.1 -S ENTROPY -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5"};
+         
+         GeneticSearch ga = new GeneticSearch();
+         BayesNet bayesNet = new BayesNet();
+         bayesNet.buildClassifier(dataMICE);
+         
+         ga.buildStructure(bayesNet, dataMICE);
+         //ga.setPopulationSize(50);
+         //ga.descendantPopulationSizeTipText();
+         //ga.setOptions("-L 50 -A 100 -U 100 -R 1 -M 0.9 -C 0.1");
+         //eval.setOptions(WrapperEvalOpts_nbc); 
+         eval.buildEvaluator(dataMICE); 
+         
+         //BestFirst search = new BestFirst();
+         attsel.setEvaluator(eval);
+         //attsel.setSearch(search);
+         attsel.SelectAttributes(dataMICE);
+         
+         int indices[] = attsel.selectedAttributes();
+         System.out.println(indices[0]);
+         dataMICE = attsel.reduceDimensionality(dataMICE);
+         //System.out.println(dataMICE);
+         filename = "DATABASE/FeatureSelection/GA/MICE/"+FileDB[i]+".arff";
+         arffSaver = saveInstancesToArffFile(dataMICE,filename);
+     }
     return null;
 }
 
@@ -162,47 +226,16 @@ public Instances remove_attributes(int[] indices, Instances data) throws Excepti
     return Data;
 }
 
-public Classifier  buildClassifier_J48(Instances data_train)throws Exception{
-    try
-    {
-        String[] options = new String[1];
-        options[0] = "-U";            // unpruned tree
-        J48 tree = new J48();         // new instance of tree
-        tree.setOptions(options);     // set the options
-        tree.buildClassifier(data_train);   // build classifier
-       return tree; 
-    }catch(IOException e) {
-        System.out.println("Hay algo mal al leer el archivo " + e);
-    return null;
-    }
+public void Classifier_J48(Instances data)throws Exception
+{
+    String[] options = new String[1];
+    options[0] = "-U";            // unpruned tree
+    J48 tree = new J48();         // new instance of tree
+    tree.setOptions(options);     // set the options
+    tree.buildClassifier(data);   // build classifier
+    Evaluation eval = new Evaluation(data);
+    eval.crossValidateModel(tree, data, 10, new Random(1));
+    System.out.println(eval.toSummaryString("\nResults\n======\n", false));
+    System.out.println(eval.weightedPrecision());
 }
-public String evaluateModel(Classifier model, Instances traindataset, Instances testdataset)throws Exception{
-        Evaluation eval = null;
-        try {
-            // Evaluate classifier with test dataset
-            eval = new Evaluation(traindataset);
-            eval.evaluateModel(model, testdataset,10,new Random(1));
-            
- 
-        } catch (Exception e) {
-            System.out.println("Hay algo mal al evaluar el modelo " + e);
-        }
-        return eval.toSummaryString("", true);
-    }
-
-public Classifier  buildClassifier_PART(Instances data_train)throws Exception{
-    try
-    {
-       // String[] options = new String[1];
-        //options[0] = "-U";            // unpruned tree
-        PART rules = new PART();         // new instance of tree
-        //rules.setOptions(options);     // set the options
-        rules.buildClassifier(data_train);   // build classifier
-       return rules; 
-    }catch(IOException e) {
-        System.out.println("Hay algo mal al leer el archivo " + e);
-    return null;
-    }
-}
-
 }
