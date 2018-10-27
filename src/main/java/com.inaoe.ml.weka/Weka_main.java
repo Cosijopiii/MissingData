@@ -9,9 +9,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Random;
 import weka.attributeSelection.AttributeSelection;
 import weka.attributeSelection.BestFirst;
 import weka.attributeSelection.CfsSubsetEval;
+import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
+import weka.classifiers.rules.PART;
+import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 import weka.filters.Filter;
@@ -155,5 +160,49 @@ public Instances remove_attributes(int[] indices, Instances data) throws Excepti
     Data = Filter.useFilter(data, removeFilter);
     System.out.println(Data);
     return Data;
+}
+
+public Classifier  buildClassifier_J48(Instances data_train)throws Exception{
+    try
+    {
+        String[] options = new String[1];
+        options[0] = "-U";            // unpruned tree
+        J48 tree = new J48();         // new instance of tree
+        tree.setOptions(options);     // set the options
+        tree.buildClassifier(data_train);   // build classifier
+       return tree; 
+    }catch(IOException e) {
+        System.out.println("Hay algo mal al leer el archivo " + e);
+    return null;
+    }
+}
+public String evaluateModel(Classifier model, Instances traindataset, Instances testdataset)throws Exception{
+        Evaluation eval = null;
+        try {
+            // Evaluate classifier with test dataset
+            eval = new Evaluation(traindataset);
+            eval.evaluateModel(model, testdataset,10,new Random(1));
+            
+ 
+        } catch (Exception e) {
+            System.out.println("Hay algo mal al evaluar el modelo " + e);
+        }
+        return eval.toSummaryString("", true);
+    }
+
+public Classifier  buildClassifier_PART(Instances data_train)throws Exception{
+    try
+    {
+       // String[] options = new String[1];
+        //options[0] = "-U";            // unpruned tree
+        PART rules = new PART();         // new instance of tree
+        //rules.setOptions(options);     // set the options
+        rules.buildClassifier(data_train);   // build classifier
+       return rules; 
+    }catch(IOException e) {
+        System.out.println("Hay algo mal al leer el archivo " + e);
+    return null;
+    }
+}
 }
 }
