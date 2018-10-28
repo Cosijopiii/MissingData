@@ -18,6 +18,8 @@ import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.search.global.GeneticSearch;
+import weka.classifiers.functions.MultilayerPerceptron;
+import weka.classifiers.lazy.IBk;
 import weka.classifiers.rules.PART;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
@@ -225,8 +227,7 @@ public Instances remove_attributes(int[] indices, Instances data) throws Excepti
     System.out.println(Data);
     return Data;
 }
-
-public void Classifier_J48(Instances data)throws Exception
+public double Classifier_J48(Instances data)throws Exception
 {
     String[] options = new String[1];
     options[0] = "-U";            // unpruned tree
@@ -237,5 +238,46 @@ public void Classifier_J48(Instances data)throws Exception
     eval.crossValidateModel(tree, data, 10, new Random(1));
     System.out.println(eval.toSummaryString("\nResults\n======\n", false));
     System.out.println(eval.weightedPrecision());
+    double w = eval.weightedPrecision();
+    return w;
 }
+public double Classifier_PART(Instances data) throws Exception
+{
+    PART part = new PART();
+    part.buildClassifier(data);
+    Evaluation eval = new Evaluation(data);
+    eval.crossValidateModel(part, data, 10, new Random(1));
+    System.out.println(eval.toSummaryString("\nResults\n======\n", false));
+    System.out.println(eval.weightedPrecision());
+    double w = eval.weightedPrecision();
+    return w;
+}
+public double Classifier_KNN(Instances data) throws Exception
+{
+   IBk knn = new IBk();
+   knn.buildClassifier(data);
+   Evaluation eval = new Evaluation(data);
+    eval.crossValidateModel(knn, data, 10, new Random(1));
+    System.out.println(eval.toSummaryString("\nResults\n======\n", false));
+    System.out.println(eval.weightedPrecision());
+    double w = eval.weightedPrecision();
+    return w;
+}
+public double Classifier_MLP(Instances data)throws Exception{
+    double w;
+    MultilayerPerceptron mlp = new MultilayerPerceptron();
+    //Setting Parameters
+    mlp.setLearningRate(0.1);
+    mlp.setMomentum(0.2);
+    mlp.setTrainingTime(2000);
+    mlp.setHiddenLayers("1");
+    mlp.buildClassifier(data);
+    Evaluation eval = new Evaluation(data);
+    eval.crossValidateModel(mlp, data, 10, new Random(1));
+    System.out.println(eval.toSummaryString("\nResults\n======\n", false));
+    System.out.println(eval.weightedRecall());
+    w = eval.weightedPrecision();
+    return w;
+}
+
 }
