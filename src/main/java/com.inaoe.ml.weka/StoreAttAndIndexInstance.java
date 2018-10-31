@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class StoreAttAndIndexInstance {
     public ArrayList<Attribute> attribute;
+    public int[] pos;
     public int anInt;
 
     public StoreAttAndIndexInstance(){
@@ -16,4 +17,11 @@ public class StoreAttAndIndexInstance {
         this.attribute=attribute;
     }
 
+    public int[] getPos() {
+        return pos;
+    }
+
+    public void setPos(int[] pos) {
+        this.pos = pos;
+    }
 }

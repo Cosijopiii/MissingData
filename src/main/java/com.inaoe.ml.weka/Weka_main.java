@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package weka;
+package com.inaoe.ml.weka;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,7 +32,9 @@ import weka.filters.unsupervised.attribute.Remove;
  *
  * @author Fer
  */
-public class Weka_main {
+public class Weka_main {{
+
+}
     
 public Instances Open(String nameFile){
 Instances datos;
@@ -95,7 +97,8 @@ public Instances CFS()throws Exception
          arffSaver = saveInstancesToArffFile(dataMICE,filename);
      }
      
-     for (int i = 0; i<FileDB.length; i++)
+     for (int i = 0; i<FileDB.length;
+          i++)
      {
          for(int j=5; j<=20; j=j+5)
          {
