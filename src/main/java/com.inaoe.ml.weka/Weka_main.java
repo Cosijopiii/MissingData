@@ -193,7 +193,7 @@ public  Instances GA()throws Exception
          attsel.SelectAttributes(dataMICE);
          
          int indices[] = attsel.selectedAttributes();
-         System.out.println(indices[0]);
+         //System.out.println(indices[0]);
          dataMICE = attsel.reduceDimensionality(dataMICE);
          //System.out.println(dataMICE);
          filename = "DATABASE/FeatureSelection/GA/MICE/"+FileDB[i]+".arff";
@@ -222,7 +222,7 @@ public Instances remove_attributes(int[] indices, Instances data) throws Excepti
     removeFilter.setInvertSelection(true);
     removeFilter.setInputFormat(data);
     Data = Filter.useFilter(data, removeFilter);
-    System.out.println(Data);
+    //System.out.println(Data);
     return Data;
 }
 
@@ -247,7 +247,7 @@ public Evaluation Evaluation_Classifier(Classifier C, Instances data)throws Exce
     Evaluation eval = new Evaluation(data);
     eval.crossValidateModel(C, data, 10, new Random(1));
     System.out.println(eval.toSummaryString("\nResults\n======\n", false));
-    System.out.println(eval.weightedPrecision());
+    //System.out.println(eval.weightedPrecision());
     return eval;
 }
 public Classifier Classifier_PART(Instances data) throws Exception
