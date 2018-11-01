@@ -202,13 +202,8 @@ public  Instances GA()throws Exception
     return null;
 }
 
-public int[] cfs_attributes(String FileName)throws Exception
+public int[] cfs_attributes(Instances dataMICE)throws Exception
 {
-     Instances dataMICE;
-     String pathMICE = "DATABASE/MICEImp/";
-     String format = ".arff";
-     String imputation = "-MICE";
-     dataMICE = this.Open(pathMICE+FileName+imputation+format);
      AttributeSelection attsel = new AttributeSelection();
      CfsSubsetEval eval = new CfsSubsetEval();
      BestFirst search = new BestFirst();
@@ -230,44 +225,40 @@ public Instances remove_attributes(int[] indices, Instances data) throws Excepti
     System.out.println(Data);
     return Data;
 }
-public double Classifier_J48(Instances data)throws Exception
+
+public double Weight_Classifier(Evaluation eval)throws Exception
+{
+    System.out.println(eval.weightedPrecision());
+    double w = eval.weightedPrecision();
+    return w;
+}
+
+public Classifier Classifier_J48(Instances data) throws Exception
 {
     String[] options = new String[1];
     options[0] = "-U";            // unpruned tree
     J48 tree = new J48();         // new instance of tree
     tree.setOptions(options);     // set the options
     tree.buildClassifier(data);   // build classifier
+    return tree;
+}
+public Evaluation Evaluation_Classifier(Classifier C, Instances data)throws Exception
+{
     Evaluation eval = new Evaluation(data);
-    eval.crossValidateModel(tree, data, 10, new Random(1));
+    eval.crossValidateModel(C, data, 10, new Random(1));
     System.out.println(eval.toSummaryString("\nResults\n======\n", false));
     System.out.println(eval.weightedPrecision());
-    double w = eval.weightedPrecision();
-    return w;
+    return eval;
 }
-public double Classifier_PART(Instances data) throws Exception
+public Classifier Classifier_PART(Instances data) throws Exception
 {
     PART part = new PART();
     part.buildClassifier(data);
-    Evaluation eval = new Evaluation(data);
-    eval.crossValidateModel(part, data, 10, new Random(1));
-    System.out.println(eval.toSummaryString("\nResults\n======\n", false));
-    System.out.println(eval.weightedPrecision());
-    double w = eval.weightedPrecision();
-    return w;
+    return part;
 }
-public double Classifier_KNN(Instances data) throws Exception
+
+public Classifier Classifier_MLP(Instances data) throws Exception
 {
-   IBk knn = new IBk();
-   knn.buildClassifier(data);
-   Evaluation eval = new Evaluation(data);
-    eval.crossValidateModel(knn, data, 10, new Random(1));
-    System.out.println(eval.toSummaryString("\nResults\n======\n", false));
-    System.out.println(eval.weightedPrecision());
-    double w = eval.weightedPrecision();
-    return w;
-}
-public double Classifier_MLP(Instances data)throws Exception{
-    double w;
     MultilayerPerceptron mlp = new MultilayerPerceptron();
     //Setting Parameters
     mlp.setLearningRate(0.1);
@@ -275,12 +266,14 @@ public double Classifier_MLP(Instances data)throws Exception{
     mlp.setTrainingTime(2000);
     mlp.setHiddenLayers("1");
     mlp.buildClassifier(data);
-    Evaluation eval = new Evaluation(data);
-    eval.crossValidateModel(mlp, data, 10, new Random(1));
-    System.out.println(eval.toSummaryString("\nResults\n======\n", false));
-    System.out.println(eval.weightedRecall());
-    w = eval.weightedPrecision();
-    return w;
+    return mlp;
+}
+
+public Classifier Classifier_KNN(Instances data) throws Exception
+{
+   IBk knn = new IBk();
+   knn.buildClassifier(data);
+   return knn;
 }
 
 }
