@@ -1,20 +1,29 @@
 package com.inaoe.ml.weka;
 
-import weka.Weka_main;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 public class Main {
 
-     public static void main (String argv[]){
-        Weka_main wm = new Weka_main();
-        Missingpattern m=new Missingpattern("Credit");
-        ArrayList<StoreAttAndIndexInstance> t= m.getPatterns();
-         for (StoreAttAndIndexInstance s:t) {
-             System.out.println(Arrays.toString(s.getPos())+" "+s.anInt);
-         }
+     public static void main (String argv[]) throws Exception {
+//        Weka_main wm = new Weka_main();
+//        Missingpattern m=new Missingpattern("Credit");
+//        ArrayList<StoreAttAndIndexInstance> t= m.getPatterns();
+//         for (StoreAttAndIndexInstance s:t) {
+//             System.out.println(Arrays.toString(s.getPos())+" "+s.anInt);
+//         }
         //cfs_attributes(
+         String path="src/main/resources/DATABASE/MICEImp/";
+          String file="Credit-MICE.arff";
+         String pathOr="src/main/resources/DATABASE/OriginalDB/";
+         String fileOr="Credit.arff";
+         TrainProces trainProces=new TrainProces(path,file,pathOr,fileOr);
+         trainProces.TrainningProcess();
+        trainProces.print();
+
+
+
     }
 
 }

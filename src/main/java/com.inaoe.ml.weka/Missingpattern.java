@@ -9,32 +9,26 @@ import java.util.function.Consumer;
 
 public class Missingpattern {
     public String file;
-    Weka_main w = new Weka_main();
-    /**
-     * @param file Es el nombre del archivo por ejemplo  "Credit"
-     */
-    public Missingpattern(String file){
-        this.file=file;
-//       ArrayList<StoreAttAndIndexInstance> MP=getPatterns();
-//        for (StoreAttAndIndexInstance aMP : MP) {
-//            for (Attribute attribute:aMP.attribute) {
-//                System.out.println(attribute);
-//            }
-//            System.out.println(aMP.anInt);
-//        }
+     Instances instances;
+
+
+    public Missingpattern(Instances instances){
+        this.instances=instances;
     }
+
+
     public ArrayList<StoreAttAndIndexInstance> getPatterns( ){
 
-        //String file="Credit";
-        String format = ".arff";
-        Instances get=w.Open( file+format);
+         //String format = ".arff";
+        // Instances get=w.Open( file+format);
+        Instances get=instances;
         ArrayList<Attribute> temp;
         ArrayList<StoreAttAndIndexInstance> MP=new ArrayList<>();
 
         for (int i=0; i<get.numInstances();i++){
             temp=new ArrayList<>();
-            int[] ints=new int[get.numAttributes()];
-            for (int k = 0; k < get.numAttributes(); k++) {
+            int[] ints=new int[get.numAttributes()-1];
+            for (int k = 0; k < get.numAttributes()-1; k++) {
                 ints[k]=0;
             }
             for (int j = 0; j < get.numAttributes(); j++) {

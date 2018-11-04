@@ -51,7 +51,6 @@ public ApplicationProcess (){
         }
         public  Instance reduceXtSF(Instance X, int sf[]){
 
-
             return null;
         }
     private String getvalue(Attribute a, Instance i, int k){
