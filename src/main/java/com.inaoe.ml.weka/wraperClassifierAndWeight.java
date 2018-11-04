@@ -35,9 +35,6 @@ public class wraperClassifierAndWeight {
 
     @Override
     public String toString() {
-        return "wraperClassifierAndWeight{" +
-                "classifier=" + classifier +
-                ", weight=" + weight +
-                '}';
+        return "weight=" + weight;
     }
 }

@@ -226,6 +226,19 @@ public Instances remove_attributes(int[] indices, Instances data) throws Excepti
     return Data;
 }
 
+
+    public Instances remove_attributes_not_Inv(int[] indices, Instances data) throws Exception
+    {
+        Instances Data;
+        Remove removeFilter = new Remove();
+        removeFilter.setAttributeIndicesArray(indices);
+         removeFilter.setInputFormat(data);
+        Data = Filter.useFilter(data, removeFilter);
+        //System.out.println(Data);
+        return Data;
+    }
+
+
 public double Weight_Classifier(Evaluation eval)throws Exception
 {
     System.out.println(eval.weightedPrecision());

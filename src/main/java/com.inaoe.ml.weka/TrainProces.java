@@ -37,16 +37,16 @@ public class TrainProces {
         Instances instancesOriginal=util.Open(path2+file2);
         classifierAndWeights=new ArrayList<>();
         Instances instances=util.Open(path+file);// instancia ya imputada
-        fs=util.cfs_attributes(instances); //selecciono caracteristicas
+         fs=util.cfs_attributes(instances); //selecciono caracteristicas
+        System.out.println(Arrays.toString(fs));
         Instances rfs=util.remove_attributes(fs,instancesOriginal); // remuevo caracteristicas seleccionadas
         Missingpattern missingpattern=new Missingpattern(rfs); // encuentro missing patterns
         ArrayList<StoreAttAndIndexInstance> storeAttAndIndexInstances= missingpattern.getPatterns();// obtengo un array
-        storeAttAndIndexInstances.forEach(storeAttAndIndexInstance -> System.out.println(Arrays.toString(storeAttAndIndexInstance.pos)));
-        System.out.println(rfs);
-        for (StoreAttAndIndexInstance s: storeAttAndIndexInstances) {  //por cada missin parttern hacer:
+        storeAttAndIndexInstances.forEach(storeAttAndIndexInstance -> System.out.println(Arrays.toString(storeAttAndIndexInstance.getPos())));
+         for (StoreAttAndIndexInstance s: storeAttAndIndexInstances) {  //por cada missin parttern hacer:
             try {
-                Instances cp= util.remove_attributes(s.getPos(),rfs);
-                Classifier ci=util.Classifier_J48(cp);
+                Instances cp= util.remove_attributes_not_Inv(s.getPos(),rfs);
+                 Classifier ci=util.Classifier_J48(cp);
                 double wi=util.Weight_Classifier(util.Evaluation_Classifier(ci,cp));
                 classifierAndWeights.add(new wraperClassifierAndWeight(ci,wi));
             } catch (Exception e) {
@@ -61,7 +61,6 @@ public class TrainProces {
     }
 
     public void print(){
-        System.out.println(Arrays.toString(fs));
         classifierAndWeights.forEach(System.out::println);
     }
 
