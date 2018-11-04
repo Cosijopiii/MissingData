@@ -13,15 +13,19 @@ import java.util.Random;
 import weka.attributeSelection.AttributeSelection;
 import weka.attributeSelection.BestFirst;
 import weka.attributeSelection.CfsSubsetEval;
+import weka.attributeSelection.InfoGainAttributeEval;
+import weka.attributeSelection.Ranker;
 import weka.attributeSelection.WrapperSubsetEval;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.BayesNet;
+import weka.classifiers.bayes.NaiveBayesMultinomial;
 import weka.classifiers.bayes.net.search.global.GeneticSearch;
 import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.lazy.IBk;
 import weka.classifiers.rules.PART;
 import weka.classifiers.trees.J48;
+import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 import weka.filters.Filter;
@@ -130,6 +134,23 @@ public Instances CFS()throws Exception
      return null;
 }
 
+public Instances IG(Instances data)throws Exception
+{
+        InfoGainAttributeEval eval = new InfoGainAttributeEval();
+	Ranker search = new Ranker();
+	search.setOptions(new String[] { "-T", "0.05" });	// information gain threshold
+	AttributeSelection attSelect = new AttributeSelection();
+	attSelect.setEvaluator(eval);
+	attSelect.setSearch(search);
+	// apply attribute selection
+	attSelect.SelectAttributes(data);
+	int indices[] = attSelect.selectedAttributes();
+	// remove the attributes not selected in the last run
+	data = attSelect.reduceDimensionality(data);
+        //System.out.println(data);
+    return data;
+}
+
 private  File saveInstancesToArffFile(Instances instances, String filename) throws IOException
 {
     try
@@ -142,7 +163,6 @@ private  File saveInstancesToArffFile(Instances instances, String filename) thro
     }
     ArffSaver arffSaver = new ArffSaver();
     arffSaver.setInstances(instances);
-    
     arffSaver.setFile(outputFile);
     arffSaver.writeBatch();  
      return arffSaver.retrieveFile();
@@ -161,21 +181,15 @@ public  Instances GA()throws Exception
      String pathDB = "DATABASE/OriginalDB/";
      String pathKNN = "DATABASE/KnnImputation/";
      String format = ".arff";
-     
      String imputation = "-MICE";
-
      String []FileDB = {"Credit","Heart-c","Heart-h","hepatitis","house-votes-84","mammographic_masses"};
-     
      for (int i = 0; i<FileDB.length; i++)
      {
          dataMICE = Open(pathMICE+FileDB[i]+imputation+format);
-         
          AttributeSelection attsel = new AttributeSelection();
          WrapperSubsetEval eval = new WrapperSubsetEval();
-         
          //WrapperSubsetEval WrapperEval_nbc = new WrapperSubsetEval(); 
          String[] WrapperEvalOpts_nbc = {"-B weka.classifiers.bayes.BayesNet -F 5 -T 0.01 -R 1 -E ACC -- -Q weka.classifiers.bayes.net.search.local.GeneticSearch -- -L 50 -A 100 -U 100 -R 1 -M 0.9 -C 0.1 -S ENTROPY -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5"};
-         
          GeneticSearch ga = new GeneticSearch();
          BayesNet bayesNet = new BayesNet();
          bayesNet.buildClassifier(dataMICE);
@@ -275,5 +289,16 @@ public Classifier Classifier_KNN(Instances data) throws Exception
    knn.buildClassifier(data);
    return knn;
 }
+public Classifier Classifier_NB(Instances data)throws Exception{
+    NaiveBayesMultinomial NBM = new NaiveBayesMultinomial();
+    NBM.buildClassifier(data);
+    return NBM;
+}
 
+public Classifier Classifier_RF(Instances data)throws Exception
+{
+    RandomForest RF = new RandomForest();
+    RF.buildClassifier(data);
+    return RF;
+}
 }
