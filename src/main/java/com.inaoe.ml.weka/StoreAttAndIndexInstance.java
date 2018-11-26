@@ -24,7 +24,7 @@ public class StoreAttAndIndexInstance {
         ArrayList<Integer>temp=new ArrayList<>();
 
         for (int i:pos) {
-            if (i>0){
+            if (i>=0){
                 temp.add(i);
             }
         }

@@ -1,4 +1,4 @@
-@relation Heart-c.data.txt
+@relation Heart-c.data
 
 @attribute age numeric
 @attribute sex numeric
@@ -13,7 +13,7 @@
 @attribute slope numeric
 @attribute ca numeric
 @attribute thal numeric
-@attribute CLASS numeric
+@attribute CLASS {0,1,2,3,4}
 
 @data
 63,1,1,145,233,1,2,150,0,2.3,3,0,6,0

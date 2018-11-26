@@ -22,8 +22,7 @@ public class Missingpattern {
 
     public ArrayList<StoreAttAndIndexInstance> getPatterns( ){
 
-         //String format = ".arff";
-        // Instances get=w.Open( file+format);
+
         Instances get=instances;
         ArrayList<Attribute> temp;
         ArrayList<StoreAttAndIndexInstance> MP=new ArrayList<>();
@@ -32,19 +31,19 @@ public class Missingpattern {
             temp=new ArrayList<>();
             int[] ints=new int[get.numAttributes()];
             for (int k = 0; k < get.numAttributes(); k++) {
-                ints[k]=0;
+                ints[k]=-1;
             }
             for (int j = 0; j < get.numAttributes(); j++) {
                 String v=getvalue(get.instance(i).attribute(j),get.instance(i),j);
                 if (v.equals("?")||v.equals("NaN")) {
-                    temp.add(get.instance(i).attribute(j));
-                    ints[j] = j+1;
+                     temp.add(get.instance(i).attribute(j));
+
+                    ints[j] = j;
                 }
           }
-          if (temp.size()>0) {
+           if (temp.size()>0) {
                 StoreAttAndIndexInstance tt=new StoreAttAndIndexInstance(temp,i);
                 if (!search(MP,ints)){
-
                     tt.setPos(ints);
                     MP.add(tt);
 
@@ -63,8 +62,6 @@ public class Missingpattern {
             if (Arrays.equals(t.get(i).pos, o)){
                  return true;
             }
-
-
         }
 
         return false;

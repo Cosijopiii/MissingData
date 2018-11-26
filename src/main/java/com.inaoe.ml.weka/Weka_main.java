@@ -243,48 +243,49 @@ public Instances remove_attributes(int[] indices, Instances data) throws Excepti
 
     public Instances remove_attributes_not_Inv(int[] indices, Instances data) throws Exception
     {
+        System.out.println(data);
+
+
         Instances Data;
         Remove removeFilter = new Remove();
         removeFilter.setAttributeIndicesArray(indices);
          removeFilter.setInputFormat(data);
         Data = Filter.useFilter(data, removeFilter);
-        //System.out.println(Data);
+        System.out.println(Data);
         return Data;
+
+
+
     }
 
 
 public double Weight_Classifier(Evaluation eval)throws Exception
 {
-    System.out.println(eval.weightedPrecision());
-    double w = eval.weightedPrecision();
+     double w = eval.weightedPrecision();
     return w;
 }
 
-public Classifier Classifier_J48(Instances data) throws Exception
+public Classifier Classifier_J48() throws Exception
 {
     String[] options = new String[1];
     options[0] = "-U";            // unpruned tree
     J48 tree = new J48();         // new instance of tree
-    tree.setOptions(options);     // set the options
-    tree.buildClassifier(data);   // build classifier
-    return tree;
+    tree.setOptions(options);     // set the option
+     return tree;
 }
 public Evaluation Evaluation_Classifier(Classifier C, Instances data)throws Exception
 {
     Evaluation eval = new Evaluation(data);
     eval.crossValidateModel(C, data, 10, new Random(1));
-    System.out.println(eval.toSummaryString("\nResults\n======\n", false));
-    //System.out.println(eval.weightedPrecision());
     return eval;
 }
-public Classifier Classifier_PART(Instances data) throws Exception
+public Classifier Classifier_PART( ) throws Exception
 {
     PART part = new PART();
-    part.buildClassifier(data);
-    return part;
+     return part;
 }
 
-public Classifier Classifier_MLP(Instances data) throws Exception
+public Classifier Classifier_MLP() throws Exception
 {
     MultilayerPerceptron mlp = new MultilayerPerceptron();
     //Setting Parameters
@@ -292,26 +293,22 @@ public Classifier Classifier_MLP(Instances data) throws Exception
     mlp.setMomentum(0.2);
     mlp.setTrainingTime(2000);
     mlp.setHiddenLayers("1");
-    mlp.buildClassifier(data);
-    return mlp;
+     return mlp;
 }
 
-public Classifier Classifier_KNN(Instances data) throws Exception
+public Classifier Classifier_KNN( ) throws Exception
 {
    IBk knn = new IBk();
-   knn.buildClassifier(data);
-   return knn;
+    return knn;
 }
-public Classifier Classifier_NB(Instances data)throws Exception{
+public Classifier Classifier_NB( )throws Exception{
     NaiveBayesMultinomial NBM = new NaiveBayesMultinomial();
-    NBM.buildClassifier(data);
-    return NBM;
+     return NBM;
 }
 
-public Classifier Classifier_RF(Instances data)throws Exception
+public Classifier Classifier_RF( )throws Exception
 {
     RandomForest RF = new RandomForest();
-    RF.buildClassifier(data);
-    return RF;
+     return RF;
 }
 }

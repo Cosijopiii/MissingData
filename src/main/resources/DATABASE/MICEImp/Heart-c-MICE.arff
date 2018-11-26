@@ -1,21 +1,20 @@
-@relation Heart-c-Imputed
-
-@attribute age numeric
-@attribute sex numeric
-@attribute cp numeric
-@attribute trestbps numeric
-@attribute chol numeric
-@attribute fbs numeric
-@attribute restecg numeric
-@attribute thalach numeric
-@attribute exang numeric
-@attribute oldpeak numeric
-@attribute slope numeric
-@attribute ca numeric
-@attribute thal numeric
-@attribute CLASS numeric
-
-@data
+@relation Heart-c-Imputed													
+													
+@attribute age numeric													
+@attribute sex numeric													
+@attribute cp numeric													
+@attribute trestbps numeric													
+@attribute chol numeric													
+@attribute fbs numeric													
+@attribute restecg numeric													
+@attribute thalach numeric													
+@attribute exang numeric													
+@attribute oldpeak numeric													
+@attribute slope numeric													
+@attribute ca numeric													
+@attribute thal numeric													
+@attribute CLASS {0,1,2,3,4}
+@data													
 63,1,1,145,233,1,2,150,0,2.3,3,0,6,0
 67,1,4,160,286,0,2,108,1,1.5,2,3,3,2
 67,1,4,120,229,0,2,129,1,2.6,2,2,7,1

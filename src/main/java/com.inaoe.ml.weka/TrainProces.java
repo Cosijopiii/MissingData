@@ -2,53 +2,76 @@ package com.inaoe.ml.weka;
 
 
 import weka.classifiers.Classifier;
+import weka.core.Attribute;
 import weka.core.Instances;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.Consumer;
 
 public class TrainProces {
 
-    public String path;//="src/main/resources/DATABASE/MICEImp/";
-    public String file;//="Credit-MICE";
-    public String path2;
-    public String file2;
-    public ArrayList<wraperClassifierAndWeight> classifierAndWeights;
+    public ArrayList<WrapperClassifierAndWeight> classifierAndWeights;
     public int []fs;
-    public TrainProces(String path,String file,String path2, String file2){
-        this.path=path;
-        this.file=file;
-        this.path2=path2;
-        this.file2=file2;
+    public  Instances miceTrain;
+    public  Instances originalTrain;
+    public   ArrayList<ArrayList<Attribute>> schemaAttributes;
+    public TrainProces(Instances miceTrain,Instances originalTrain){
+        this.miceTrain=miceTrain;
+        this.originalTrain=originalTrain;
     }
 
-    /*TODO: Hacer que los metodos de clasificacion retornen el modelo y los pesos
-      TODO: Necesito los valores que se reducieron al momento de la seleccion de caracteristicas
-      Explicacion: Genera N clasificadores por cada patron completo (Le quito a los datos que estan reducidas en caracteristicas
-      las columnas con valores faltantes), es un tipo de clasificador por cada dato.
-     */
     public void TrainningProcess() throws Exception {
         /*
         * Obtener las caracteristicas seleccionados
         * */
         Weka_main util=new Weka_main();
         //instancias con las carateristicas seleccionadas
-        Instances instancesOriginal=util.Open(path2+file2);
+        Instances instancesOriginal=this.originalTrain;
         classifierAndWeights=new ArrayList<>();
-        Instances instances=util.Open(path+file);// instancia ya imputada
+
+        Instances instances=this.miceTrain;
+
          fs=util.cfs_attributes(instances); //selecciono caracteristicas
-        System.out.println(Arrays.toString(fs));
+
+        //Instance Selection HERE? 1
+        InstanceSelection is=new InstanceSelection(util.remove_attributes(fs,instances));
+        int [] arrSi= is.selectInstances();
+
         Instances rfs=util.remove_attributes(fs,instancesOriginal); // remuevo caracteristicas seleccionadas
-        Missingpattern missingpattern=new Missingpattern(rfs); // encuentro missing patterns
-        ArrayList<StoreAttAndIndexInstance> storeAttAndIndexInstances= missingpattern.getPatterns();// obtengo un array
-        storeAttAndIndexInstances.forEach(storeAttAndIndexInstance -> System.out.println(Arrays.toString(storeAttAndIndexInstance.getPos())));
+
+
+        Instances selectInstances=getInstancesValues(arrSi,rfs);
+        selectInstances.setClassIndex(selectInstances.classIndex());
+
+        //System.out.println(selectInstances);
+        //System.out.println(selectInstances.classIndex());
+        //Instance Selection HERE? 1
+
+     /*   */
+
+
+        Missingpattern missingpattern=new Missingpattern(selectInstances); // encuentro missing patterns
+
+        ArrayList<StoreAttAndIndexInstance> storeAttAndIndexInstances= missingpattern.getPatterns();
+        storeAttAndIndexInstances.forEach(storeAttAndIndexInstance ->
+               System.out.println("MP: "+Arrays.toString(storeAttAndIndexInstance.getPos())));
+        schemaAttributes=new ArrayList<>();
          for (StoreAttAndIndexInstance s: storeAttAndIndexInstances) {  //por cada missin parttern hacer:
+
             try {
-                Instances cp= util.remove_attributes_not_Inv(s.getPos(),rfs);
-                 Classifier ci=util.Classifier_J48(cp);
+                 Instances cp= util.remove_attributes_not_Inv(s.getPos(),selectInstances);
+                cp.setClassIndex(cp.classIndex());
+                 ArrayList<Attribute> tempAttributes=new ArrayList<>();
+                for (int i = 0; i < cp.numAttributes(); i++) {
+                    tempAttributes.add(cp.attribute(i));
+                }
+
+                schemaAttributes.add(tempAttributes);
+                  Classifier ci=util.Classifier_J48();
+                 ci.buildClassifier(cp);
+
                 double wi=util.Weight_Classifier(util.Evaluation_Classifier(ci,cp));
-                classifierAndWeights.add(new wraperClassifierAndWeight(ci,wi));
+                classifierAndWeights.add(new WrapperClassifierAndWeight(ci,wi));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -59,10 +82,20 @@ public class TrainProces {
 
 
     }
+    public Instances getInstancesValues(int []si,Instances instances){
 
-    public void print(){
-        classifierAndWeights.forEach(System.out::println);
+        Instances temp=new Instances(instances);
+        temp.delete();
+        for (int i = 0; i < instances.numInstances(); i++) {
+            if (si[i]==1){
+                temp.add(instances.instance(i));
+            }
+        }
+
+        return temp;
+
     }
+
 
 
 }

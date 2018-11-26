@@ -2,16 +2,16 @@ package com.inaoe.ml.weka;
 
 import weka.classifiers.Classifier;
 
-public class wraperClassifierAndWeight {
+public class WrapperClassifierAndWeight {
 
     private Classifier classifier;
     private double weight;
 
-    public wraperClassifierAndWeight(){
+    public WrapperClassifierAndWeight(){
 
     }
 
-    public wraperClassifierAndWeight(Classifier c,double w){
+    public WrapperClassifierAndWeight(Classifier c, double w){
         this.classifier=c;
         this.weight=w;
 

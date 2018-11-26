@@ -1,5 +1,7 @@
 package com.inaoe.ml.weka;
 
+import weka.core.Instances;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -11,17 +13,22 @@ public class Main {
 //        Missingpattern m=new Missingpattern("Credit");
 //        ArrayList<StoreAttAndIndexInstance> t= m.getPatterns();
 //         for (StoreAttAndIndexInstance s:t) {
-//             System.out.println(Arrays.toString(s.getPos())+" "+s.anInt);
+//             System.out.println(Arrays.toStrin
+//
+// g(s.getPos())+" "+s.anInt);
 //         }
         //cfs_attributes(
          String path="src/main/resources/DATABASE/MICEImp/";
           String file="Credit-MICE.arff";
          String pathOr="src/main/resources/DATABASE/OriginalDB/";
          String fileOr="Credit.arff";
-         TrainProces trainProces=new TrainProces(path,file,pathOr,fileOr);
-         trainProces.TrainningProcess();
-        trainProces.print();
-
+       //  TrainProces trainProces=new TrainProces(path,file,pathOr,fileOr);
+       //  trainProces.TrainningProcess();
+      //  trainProces.print();
+//        Weka_main util=new Weka_main();
+ //     Instances s= util.Open(path+file);
+ //        InstanceSelection is=new InstanceSelection(s);
+ //        is.selectInstances();
 
 
     }
